@@ -1,0 +1,53 @@
+{
+  "name": "opensigil",
+  "version": "0.1.0",
+  "description": "The Oversight Layer for AI Agents — monitor, audit, and govern AI agents locally",
+  "keywords": [
+    "ai",
+    "agents",
+    "governance",
+    "observability",
+    "audit",
+    "claude",
+    "codex",
+    "mcp",
+    "oversight"
+  ],
+  "homepage": "https://opensigil.ai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/opensigil-ai/opensigil"
+  },
+  "license": "MIT",
+  "author": "OpenSigil",
+  "main": "dist/index.js",
+  "bin": {
+    "opensigil": "./bin/opensigil.js"
+  },
+  "files": [
+    "dist/",
+    "bin/"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "ora": "^5.4.1",
+    "ps-list": "^8.1.1",
+    "chokidar": "^3.5.3",
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/node-cron": "^3.0.11",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
