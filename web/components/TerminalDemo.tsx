@@ -1,48 +1,131 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
-const TERMINAL_LINES = [
-  { delay: 0,    type: "prompt", text: "npm i -g opensigil" },
-  { delay: 600,  type: "output", text: "added 42 packages in 3s" },
-  { delay: 900,  type: "gap",    text: "" },
-  { delay: 1100, type: "prompt", text: "opensigil init" },
-  { delay: 1600, type: "info",   text: "✓ Created .opensigil/config.json" },
-  { delay: 1900, type: "info",   text: "✓ Registered policy ruleset: default" },
-  { delay: 2100, type: "gap",    text: "" },
-  { delay: 2300, type: "prompt", text: "opensigil start" },
-  { delay: 2800, type: "orange", text: "◉ OpenSigil daemon running  ◉ Log watch active" },
-  { delay: 3100, type: "gap",    text: "" },
-  { delay: 3300, type: "dim",    text: "─────────────────────────────────────────────" },
-  { delay: 3500, type: "event",  text: "[09:14:02] 🔍 PROCESS   claude --dangerously-skip-permissions" },
-  { delay: 3900, type: "event",  text: "[09:14:02] ✅ ALLOWED   Read file: src/index.ts" },
-  { delay: 4300, type: "event",  text: "[09:14:05] ✅ ALLOWED   Write file: src/index.ts" },
-  { delay: 4700, type: "warn",   text: "[09:14:09] ⚠️  BLOCKED   Exec: rm -rf /tmp/cache  → policy: no-delete" },
-  { delay: 5100, type: "event",  text: "[09:14:11] ✅ ALLOWED   HTTP GET https://api.anthropic.com/v1" },
-  { delay: 5400, type: "warn",   text: "[09:14:14] ⚠️  BLOCKED   HTTP POST https://unknown-host.io  → policy: allowlist" },
-  { delay: 5700, type: "gap",    text: "" },
-  { delay: 5900, type: "orange", text: "Sessions: 1 active · Events: 6 · Violations: 2" },
+// Each entry: either a typed command or an instant output line
+type LineKind =
+  | { kind: "type";    prompt: true;  text: string; pauseAfter?: number }
+  | { kind: "instant"; prompt: false; text: string; color?: string; gap?: boolean };
+
+const SCRIPT: LineKind[] = [
+  { kind: "type",    prompt: true,  text: "npm i -g opensigil", pauseAfter: 400 },
+  { kind: "instant", prompt: false, text: "added 42 packages in 3s", color: "gray" },
+  { kind: "instant", prompt: false, text: "", gap: true },
+  { kind: "type",    prompt: true,  text: "opensigil init", pauseAfter: 350 },
+  { kind: "instant", prompt: false, text: "✓ Created .opensigil/config.json", color: "green" },
+  { kind: "instant", prompt: false, text: "✓ Registered policy ruleset: default", color: "green" },
+  { kind: "instant", prompt: false, text: "", gap: true },
+  { kind: "type",    prompt: true,  text: "opensigil start", pauseAfter: 500 },
+  { kind: "instant", prompt: false, text: "◉ OpenSigil daemon running  ◉ Log watch active", color: "orange" },
+  { kind: "instant", prompt: false, text: "", gap: true },
+  { kind: "instant", prompt: false, text: "────────────────────────────────────────────────", color: "dim" },
+  { kind: "instant", prompt: false, text: "[09:14:02] 🔍 PROCESS   claude --dangerously-skip-permissions", color: "gray" },
+  { kind: "instant", prompt: false, text: "[09:14:02] ✅ ALLOWED   Read file: src/index.ts", color: "gray" },
+  { kind: "instant", prompt: false, text: "[09:14:05] ✅ ALLOWED   Write file: src/index.ts", color: "gray" },
+  { kind: "instant", prompt: false, text: "[09:14:09] ⚠️  BLOCKED   Exec: rm -rf /tmp/cache  → policy: no-delete", color: "warn" },
+  { kind: "instant", prompt: false, text: "[09:14:11] ✅ ALLOWED   HTTP GET https://api.anthropic.com/v1", color: "gray" },
+  { kind: "instant", prompt: false, text: "[09:14:14] ⚠️  BLOCKED   HTTP POST https://unknown-host.io  → allowlist", color: "warn" },
+  { kind: "instant", prompt: false, text: "", gap: true },
+  { kind: "instant", prompt: false, text: "Sessions: 1 active · Events: 6 · Violations: 2", color: "orange" },
 ];
 
+const TYPING_SPEED = 38; // ms per char
+const INSTANT_DELAY = 120; // ms between instant lines
+
+interface RenderedLine {
+  id: number;
+  prompt: boolean;
+  text: string;      // fully displayed text so far
+  fullText: string;  // target text
+  typing: boolean;   // currently being typed
+  color: string;
+  gap: boolean;
+}
+
 export default function TerminalDemo() {
-  const [visibleCount, setVisibleCount] = useState(0);
+  const [lines, setLines] = useState<RenderedLine[]>([]);
+  const [cursorLine, setCursorLine] = useState(-1);
   const [started, setStarted] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const idRef = useRef(0);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) setStarted(true); },
-      { threshold: 0.3 }
+      { threshold: 0.25 }
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
 
+  // Auto-scroll terminal body
+  useEffect(() => {
+    if (bodyRef.current) {
+      bodyRef.current.scrollTop = bodyRef.current.scrollHeight;
+    }
+  }, [lines]);
+
+  const addLine = useCallback((partial: Omit<RenderedLine, "id">): number => {
+    const id = idRef.current++;
+    setLines(prev => [...prev, { ...partial, id }]);
+    return id;
+  }, []);
+
+  const typeIntoLine = useCallback((id: number, fullText: string): Promise<void> => {
+    return new Promise(resolve => {
+      let i = 0;
+      setCursorLine(id);
+      const tick = () => {
+        i++;
+        setLines(prev =>
+          prev.map(l => l.id === id ? { ...l, text: fullText.slice(0, i), typing: i < fullText.length } : l)
+        );
+        if (i < fullText.length) {
+          setTimeout(tick, TYPING_SPEED);
+        } else {
+          setCursorLine(-1);
+          resolve();
+        }
+      };
+      setTimeout(tick, TYPING_SPEED);
+    });
+  }, []);
+
   useEffect(() => {
     if (!started) return;
-    TERMINAL_LINES.forEach((line, i) => {
-      setTimeout(() => setVisibleCount((n) => Math.max(n, i + 1)), line.delay);
-    });
+
+    const run = async () => {
+      for (const entry of SCRIPT) {
+        if (entry.kind === "type") {
+          // Add empty line first, then type into it
+          const id = addLine({
+            prompt: true,
+            text: "",
+            fullText: entry.text,
+            typing: true,
+            color: "white",
+            gap: false,
+          });
+          await typeIntoLine(id, entry.text);
+          await delay(entry.pauseAfter ?? 300);
+        } else {
+          // Instant line
+          addLine({
+            prompt: false,
+            text: entry.text,
+            fullText: entry.text,
+            typing: false,
+            color: entry.color ?? "gray",
+            gap: entry.gap ?? false,
+          });
+          await delay(entry.gap ? 30 : INSTANT_DELAY);
+        }
+      }
+    };
+
+    run();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [started]);
 
   return (
@@ -78,42 +161,56 @@ export default function TerminalDemo() {
           </div>
 
           {/* Terminal body */}
-          <div className="bg-gray-950 terminal-body min-h-[340px]">
-            {TERMINAL_LINES.slice(0, visibleCount).map((line, i) => (
-              <div key={i} className="mb-0.5">
-                {line.type === "prompt" && (
-                  <p>
-                    <span className="terminal-prompt">❯ </span>
-                    <span className="text-white">{line.text}</span>
-                    {i === visibleCount - 1 && (
-                      <span className="inline-block w-2 h-4 bg-orange-400 ml-0.5 animate-[blink_1s_step-end_infinite] align-middle" />
+          <div
+            ref={bodyRef}
+            className="bg-gray-950 font-mono text-sm p-5 min-h-[320px] max-h-[420px] overflow-y-auto leading-relaxed"
+            style={{ scrollBehavior: "smooth" }}
+          >
+            {lines.map(line => (
+              <div key={line.id} className={line.gap ? "h-3" : "mb-0.5"}>
+                {!line.gap && (
+                  <span>
+                    {line.prompt && (
+                      <span className="text-orange-400 select-none">❯ </span>
                     )}
-                  </p>
+                    <span className={colorClass(line.color)}>
+                      {line.text}
+                    </span>
+                    {/* Blinking cursor on active typing line */}
+                    {cursorLine === line.id && (
+                      <span className="inline-block w-[7px] h-[14px] bg-orange-400 ml-[2px] align-middle animate-[blink_0.8s_step-end_infinite]" />
+                    )}
+                  </span>
                 )}
-                {line.type === "output" && (
-                  <p className="terminal-output pl-4">{line.text}</p>
-                )}
-                {line.type === "info" && (
-                  <p className="text-green-400 pl-4 text-sm">{line.text}</p>
-                )}
-                {line.type === "orange" && (
-                  <p className="terminal-output-orange font-semibold">{line.text}</p>
-                )}
-                {line.type === "event" && (
-                  <p className="terminal-output text-sm">{line.text}</p>
-                )}
-                {line.type === "warn" && (
-                  <p className="text-amber-400 text-sm">{line.text}</p>
-                )}
-                {line.type === "dim" && (
-                  <p className="text-gray-700 text-xs">{line.text}</p>
-                )}
-                {line.type === "gap" && <div className="h-1" />}
               </div>
             ))}
+
+            {/* Idle cursor when nothing is typing */}
+            {started && cursorLine === -1 && lines.length === SCRIPT.length && (
+              <div>
+                <span className="text-orange-400 select-none">❯ </span>
+                <span className="inline-block w-[7px] h-[14px] bg-orange-400 ml-[2px] align-middle animate-[blink_0.8s_step-end_infinite]" />
+              </div>
+            )}
           </div>
         </div>
       </div>
     </section>
   );
+}
+
+function colorClass(color: string): string {
+  switch (color) {
+    case "orange": return "text-orange-400 font-semibold";
+    case "green":  return "text-green-400";
+    case "warn":   return "text-amber-400";
+    case "dim":    return "text-gray-700 text-xs";
+    case "white":  return "text-white";
+    case "gray":
+    default:       return "text-gray-400";
+  }
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise(r => setTimeout(r, ms));
 }
