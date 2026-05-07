@@ -18,6 +18,16 @@ export const metadata: Metadata = {
     "agent monitoring",
   ],
   authors: [{ name: "OpenSigil", url: "https://opensigil.org" }],
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   openGraph: {
     title: "OpenSigil — The Oversight Layer for AI Agents",
     description:
@@ -25,12 +35,21 @@ export const metadata: Metadata = {
     url: "https://opensigil.org",
     siteName: "OpenSigil",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "OpenSigil — The Oversight Layer for AI Agents",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "OpenSigil — The Oversight Layer for AI Agents",
     description: "Monitor, audit, and govern AI agents locally.",
     creator: "@opensigil_org",
+    images: ["/og-image.png"],
   },
 };
 
