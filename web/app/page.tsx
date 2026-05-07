@@ -15,7 +15,7 @@ export default function Home() {
   const [bootDone, setBootDone] = useState(false);
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] text-white overflow-x-hidden">
+    <main className="min-h-screen bg-white text-gray-900 overflow-x-hidden">
       {!bootDone && <BootSequence onComplete={() => setBootDone(true)} />}
 
       <div

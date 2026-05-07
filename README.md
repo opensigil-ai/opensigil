@@ -39,7 +39,7 @@ opensigil start
 
 ## Links
 
-- Website: [opensigil.ai](https://opensigil.ai)
+- Website: [opensigil.org](https://opensigil.org)
 - Twitter: [@opensigil_org](https://x.com/opensigil_org)
 
 ## License

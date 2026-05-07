@@ -96,7 +96,7 @@ if (process.env.OPENSIGIL_DAEMON === '1') {
     console.log(`    ${chalk.white('opensigil init')}`);
     console.log(`    ${chalk.white('opensigil start')}`);
     console.log('');
-    console.log(chalk.gray(`  Docs: ${chalk.white('https://opensigil.ai')}`));
+    console.log(chalk.gray(`  Docs: ${chalk.white('https://opensigil.org')}`));
     console.log(chalk.gray(`  Twitter: ${chalk.white('https://x.com/opensigil_org')}`));
     console.log('');
     process.exit(0);

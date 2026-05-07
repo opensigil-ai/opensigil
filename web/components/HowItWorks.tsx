@@ -1,143 +1,70 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-
 const STEPS = [
   {
     number: "01",
-    title: "Install & Initialize",
-    description:
-      "Install OpenSigil globally and run `opensigil init` in your project. This creates a local config file with sensible default policies.",
-    code: "npm i -g opensigil\ncd your-project/\nopensigil init",
-    icon: "⬇",
+    title: "Install the CLI",
+    description: "One command. OpenSigil installs globally and runs locally. No cloud, no accounts, no data leaves your machine.",
+    code: "npm i -g opensigil",
   },
   {
     number: "02",
-    title: "Start the Daemon",
-    description:
-      "Run `opensigil start` to launch the background daemon. It monitors your system for AI agent processes using process signatures.",
-    code: "opensigil start\n# ● Daemon started (PID 48271)\n# 👁 Watching: claude, codex...",
-    icon: "▶",
+    title: "Initialize your project",
+    description: "Run init to create a policy config in your project. Choose from preset rulesets or write your own rules.",
+    code: "opensigil init",
   },
   {
     number: "03",
-    title: "Agents Are Monitored",
-    description:
-      "When Claude Code, Codex CLI, or any other agent starts, OpenSigil automatically begins observing every tool call and action.",
-    code: "[10:42:31] ▶ Claude Code started\n[10:42:33] ⚡ Read src/api.ts\n[10:42:34] ⚡ Write src/api.ts",
-    icon: "👁",
+    title: "Start the daemon",
+    description: "The daemon watches for AI agent processes and intercepts their actions in real time using process monitoring.",
+    code: "opensigil start",
   },
   {
     number: "04",
-    title: "Policies Are Enforced",
-    description:
-      "Policy violations are caught in real-time. Blocked actions stop the agent. Warnings are logged. Your environment stays safe.",
-    code: "⛔ BLOCKED: rm -rf ./dist\nPolicy: no-rm-rf\nAgent: Claude Code (48301)",
-    icon: "🛡",
+    title: "Watch & audit",
+    description: "Live feed of every agent action. Violations are blocked instantly. All events are logged to a JSONL audit trail.",
+    code: "opensigil watch",
   },
 ];
 
 export default function HowItWorks() {
-  const [visibleSteps, setVisibleSteps] = useState<number[]>([]);
-  const refs = useRef<(HTMLDivElement | null)[]>([]);
-
-  useEffect(() => {
-    const observers = STEPS.map((_, i) => {
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            setVisibleSteps((prev) => Array.from(new Set([...prev, i])));
-          }
-        },
-        { threshold: 0.2 }
-      );
-      if (refs.current[i]) observer.observe(refs.current[i]!);
-      return observer;
-    });
-    return () => observers.forEach((o) => o.disconnect());
-  }, []);
-
   return (
-    <section id="how-it-works" className="py-24 px-6 bg-[#0d0d0d]">
+    <section id="how-it-works" className="py-24 px-6 bg-orange-50 border-y border-orange-100">
       <div className="max-w-5xl mx-auto">
+        {/* Header */}
         <div className="text-center mb-16">
-          <p className="text-orange-500 font-mono text-sm uppercase tracking-widest mb-3">
+          <p className="text-orange-500 font-mono text-sm uppercase tracking-widest mb-3 font-semibold">
             How It Works
           </p>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             From install to oversight in{" "}
             <span className="text-orange-500">4 steps</span>
           </h2>
-          <p className="text-gray-400 text-lg max-w-xl mx-auto">
-            OpenSigil runs locally, requiring no cloud account, no API keys, and
-            no data leaving your machine.
+          <p className="text-gray-500 text-lg max-w-xl mx-auto">
+            OpenSigil runs entirely on your machine. Setup takes under a minute.
           </p>
         </div>
 
+        {/* Steps */}
         <div className="relative">
           {/* Vertical line */}
-          <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-orange-500/40 via-orange-500/20 to-transparent hidden sm:block" />
+          <div className="absolute left-6 top-0 bottom-0 w-px bg-orange-200 hidden md:block" />
 
-          <div className="space-y-12">
+          <div className="space-y-8">
             {STEPS.map((step, i) => (
-              <div
-                key={step.number}
-                ref={(el) => {
-                  refs.current[i] = el;
-                }}
-                className={`relative flex flex-col md:flex-row gap-8 items-start md:items-center transition-all duration-700 ${
-                  visibleSteps.includes(i)
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-8"
-                }`}
-                style={{ transitionDelay: `${i * 150}ms` }}
-              >
-                {/* Step number bubble */}
-                <div
-                  className={`relative z-10 flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center font-mono font-bold text-lg border-2 ${
-                    i < visibleSteps.length
-                      ? "bg-orange-500 border-orange-500 text-white"
-                      : "bg-[#111] border-[#333] text-gray-500"
-                  } transition-all duration-500`}
-                >
+              <div key={i} className="relative flex gap-6 md:gap-10">
+                {/* Number bubble */}
+                <div className="flex-shrink-0 w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm font-mono z-10 shadow-md shadow-orange-200">
                   {step.number}
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 grid md:grid-cols-2 gap-6">
-                  <div>
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-2xl">{step.icon}</span>
-                      <h3 className="text-white font-bold text-xl">
-                        {step.title}
-                      </h3>
-                    </div>
-                    <p className="text-gray-400 leading-relaxed">
-                      {step.description}
-                    </p>
-                  </div>
-                  <div className="bg-[#0A0A0A] border border-[#1a1a1a] rounded-lg p-4">
-                    <pre className="text-sm font-mono text-gray-300 leading-relaxed whitespace-pre-wrap">
-                      {step.code.split("\n").map((line, j) => (
-                        <div key={j}>
-                          {line.startsWith("#") ? (
-                            <span className="text-gray-600">{line}</span>
-                          ) : line.startsWith("⛔") ? (
-                            <span className="text-red-400">{line}</span>
-                          ) : line.startsWith("●") ||
-                            line.startsWith("👁") ? (
-                            <span className="text-orange-400">{line}</span>
-                          ) : line.startsWith("[") ? (
-                            <span className="text-gray-300">{line}</span>
-                          ) : (
-                            <span>
-                              <span className="text-orange-500">$</span>{" "}
-                              <span className="text-white">{line}</span>
-                            </span>
-                          )}
-                        </div>
-                      ))}
-                    </pre>
+                <div className="flex-1 bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mb-2">
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">{step.title}</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed mb-4">{step.description}</p>
+                  <div className="flex items-center gap-3 bg-gray-950 rounded-lg px-4 py-2.5 font-mono text-sm w-fit">
+                    <span className="text-orange-400">$</span>
+                    <span className="text-white">{step.code}</span>
                   </div>
                 </div>
               </div>

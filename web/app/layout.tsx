@@ -17,12 +17,12 @@ export const metadata: Metadata = {
     "AI oversight",
     "agent monitoring",
   ],
-  authors: [{ name: "OpenSigil", url: "https://opensigil.ai" }],
+  authors: [{ name: "OpenSigil", url: "https://opensigil.org" }],
   openGraph: {
     title: "OpenSigil — The Oversight Layer for AI Agents",
     description:
       "Monitor, audit, and govern AI agents locally. See every tool call, set policies, and maintain a complete audit trail.",
-    url: "https://opensigil.ai",
+    url: "https://opensigil.org",
     siteName: "OpenSigil",
     type: "website",
   },

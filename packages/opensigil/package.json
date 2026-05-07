@@ -1,6 +1,6 @@
 {
   "name": "opensigil",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The Oversight Layer for AI Agents — monitor, audit, and govern AI agents locally",
   "keywords": [
     "ai",
@@ -13,10 +13,10 @@
     "mcp",
     "oversight"
   ],
-  "homepage": "https://opensigil.ai",
+  "homepage": "https://opensigil.org",
   "repository": {
     "type": "git",
-    "url": "https://github.com/opensigil-ai/opensigil"
+    "url": "https://github.com/opensigil-org/opensigil"
   },
   "license": "MIT",
   "author": "OpenSigil",
