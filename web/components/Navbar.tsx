@@ -32,7 +32,7 @@ export default function Navbar() {
           <a href="#how-it-works" className="text-gray-500 hover:text-orange-500 text-sm font-medium transition-colors">How it works</a>
           <a href="#agents" className="text-gray-500 hover:text-orange-500 text-sm font-medium transition-colors">Agents</a>
           <a
-            href="https://github.com/opensigil-org/opensigil"
+            href="https://github.com/opensigil-ai/opensigil"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-500 hover:text-orange-500 text-sm font-medium transition-colors flex items-center gap-1.5"

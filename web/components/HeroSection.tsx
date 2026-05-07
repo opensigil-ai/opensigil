@@ -79,7 +79,7 @@ export default function HeroSection() {
             </button>
           </div>
           <a
-            href="https://github.com/opensigil-org/opensigil"
+            href="https://github.com/opensigil-ai/opensigil"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 border border-gray-200 hover:border-orange-300 bg-white hover:bg-orange-50 text-gray-700 hover:text-orange-600 font-medium px-5 py-3.5 rounded-xl transition-all text-sm shadow-sm"

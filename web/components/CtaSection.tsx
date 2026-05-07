@@ -26,7 +26,7 @@ export default function CtaSection() {
             <span className="text-white">npm i -g opensigil</span>
           </div>
           <a
-            href="https://github.com/opensigil-org/opensigil"
+            href="https://github.com/opensigil-ai/opensigil"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 bg-white hover:bg-orange-50 text-orange-600 font-semibold px-5 py-3.5 rounded-xl transition-colors shadow-md text-sm"

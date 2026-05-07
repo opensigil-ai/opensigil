@@ -10,10 +10,10 @@ const LINKS = {
     { label: "npm package", href: "https://npmjs.com/package/opensigil" },
   ],
   Resources: [
-    { label: "GitHub",       href: "https://github.com/opensigil-org/opensigil" },
+    { label: "GitHub",       href: "https://github.com/opensigil-ai/opensigil" },
     { label: "npm",          href: "https://npmjs.com/package/opensigil" },
     { label: "Twitter / X",  href: "https://x.com/opensigil_org" },
-    { label: "MIT License",  href: "https://github.com/opensigil-org/opensigil/blob/main/LICENSE" },
+    { label: "MIT License",  href: "https://github.com/opensigil-ai/opensigil/blob/main/LICENSE" },
   ],
   Install: [
     { label: "npm i -g opensigil",    href: "#" },
@@ -40,7 +40,7 @@ export default function Footer() {
             <div className="flex items-center gap-3">
               {/* GitHub */}
               <a
-                href="https://github.com/opensigil-org/opensigil"
+                href="https://github.com/opensigil-ai/opensigil"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-600 hover:text-orange-400 transition-colors"
