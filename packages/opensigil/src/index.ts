@@ -76,8 +76,9 @@ if (process.env.OPENSIGIL_DAEMON === '1') {
   program
     .command('init')
     .description('Initialize OpenSigil config in the current project')
-    .action(async () => {
-      await initCommand();
+    .option('--preset <name>', 'Use a preset config (bankr, default)')
+    .action(async (options) => {
+      await initCommand({ preset: options.preset });
     });
 
   // Show banner + help if no command given

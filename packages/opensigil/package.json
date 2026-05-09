@@ -1,6 +1,6 @@
 {
   "name": "opensigil",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "The Oversight Layer for AI Agents — monitor, audit, and govern AI agents locally",
   "keywords": [
     "ai",

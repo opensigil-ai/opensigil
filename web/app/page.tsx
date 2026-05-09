@@ -7,6 +7,7 @@ import TerminalDemo from "@/components/TerminalDemo";
 import FeaturesSection from "@/components/FeaturesSection";
 import HowItWorks from "@/components/HowItWorks";
 import SupportedAgents from "@/components/SupportedAgents";
+import BankrIntegration from "@/components/BankrIntegration";
 import CtaSection from "@/components/CtaSection";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
@@ -27,6 +28,7 @@ export default function Home() {
         <FeaturesSection />
         <HowItWorks />
         <SupportedAgents />
+        <BankrIntegration />
         <CtaSection />
         <Footer />
       </div>
